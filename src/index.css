@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-surface-dark text-white;
+  }
+
+  body.light {
+    @apply bg-surface-light text-slate-900;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-surface-dark;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-700 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-600;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl;
+  }
+
+  .glass-card-light {
+    @apply bg-white/80 backdrop-blur-md border border-slate-200/50 rounded-2xl shadow-lg;
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
+  }
+
+  .nav-link {
+    @apply relative px-3 py-2 text-sm font-medium transition-colors;
+  }
+
+  .nav-link::after {
+    @apply content-[''] absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-accent rounded-full transition-all duration-300;
+  }
+
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    @apply w-full;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-accent to-accent-light rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-accent/25 active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl transition-all duration-300 hover:bg-white/20 active:scale-95;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold text-accent border-2 border-accent rounded-xl transition-all duration-300 hover:bg-accent hover:text-white active:scale-95;
+  }
+
+  .audio-bar {
+    @apply fixed bottom-0 left-0 right-0 z-50 bg-surface-darker/95 backdrop-blur-md border-t border-white/10;
+  }
+
+  .live-beacon {
+    @apply relative flex h-3 w-3;
+  }
+
+  .live-beacon::before {
+    @apply content-[''] absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75 animate-ping;
+  }
+
+  .live-beacon::after {
+    @apply content-[''] relative inline-flex rounded-full h-3 w-3 bg-red-500;
+  }
+
+  .equalizer-bar {
+    @apply w-1 bg-accent rounded-full animate-equalizer;
+  }
+}
