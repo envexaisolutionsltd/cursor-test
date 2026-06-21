@@ -6,9 +6,13 @@ import AudioPlayer from './components/AudioPlayer'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
 import SchedulePage from './pages/SchedulePage'
-import NewsPage from './pages/NewsPage'
-import EventsPage from './pages/EventsPage'
+import SponsorsPage from './pages/SponsorsPage'
 import AdvertisePage from './pages/AdvertisePage'
+import CommunityHubPage from './pages/CommunityHubPage'
+import MeetTheTeamPage from './pages/MeetTheTeamPage'
+import BlogPage from './pages/BlogPage'
+import JoinTeamPage from './pages/JoinTeamPage'
+import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
 import TcsPage from './pages/TcsPage'
 import PrivacyPage from './pages/PrivacyPage'
@@ -24,9 +28,13 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/schedule" element={<SchedulePage />} />
-                <Route path="/news" element={<NewsPage />} />
-                <Route path="/events" element={<EventsPage />} />
+                <Route path="/sponsors" element={<SponsorsPage />} />
                 <Route path="/advertise" element={<AdvertisePage />} />
+                <Route path="/community-hub" element={<CommunityHubPage />} />
+                <Route path="/meet-the-team" element={<MeetTheTeamPage />} />
+                <Route path="/blog" element={<BlogPage />} />
+                <Route path="/join-team" element={<JoinTeamPage />} />
+                <Route path="/about" element={<AboutPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/tcs" element={<TcsPage />} />
                 <Route path="/privacy-policy" element={<PrivacyPage />} />

@@ -1,145 +1,70 @@
-import { useState } from 'react'
-import { Clock, User, Play } from 'lucide-react'
+import { Play } from 'lucide-react'
 import { useAudio } from '../context/AudioContext'
+import { Link } from 'react-router-dom'
 
 interface Show {
-  id: string
   title: string
-  presenter: string
-  time: string
-  day: string
-  image: string
+  description: string
   isLive?: boolean
 }
 
-const showsData: Show[] = [
-  {
-    id: '1',
-    title: 'Breakfast Show',
-    presenter: 'Sarah Johnson',
-    time: '7:00 AM - 10:00 AM',
-    day: 'Today',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face',
-  },
-  {
-    id: '2',
-    title: 'Midday Mix',
-    presenter: 'Tom Williams',
-    time: '10:00 AM - 1:00 PM',
-    day: 'Today',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
-    isLive: true,
-  },
-  {
-    id: '3',
-    title: 'Afternoon Drive',
-    presenter: 'DJ Marcus',
-    time: '4:00 PM - 7:00 PM',
-    day: 'Today',
-    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face',
-  },
-  {
-    id: '4',
-    title: 'Evening Sessions',
-    presenter: 'Emma Davis',
-    time: '7:00 PM - 10:00 PM',
-    day: 'Today',
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face',
-  },
+const todayShows: Show[] = [
+  { title: 'Morning Wake-Up', description: 'Wake up with local stories, chaos, and feel-good music.', isLive: true },
+  { title: 'Mid-Morning Mix', description: 'Non-stop anthems and massive singalong energy.' },
+  { title: 'Afternoon Anthems', description: 'Throwbacks, nostalgia, and hidden gems from every era.' },
+  { title: 'Evening Sessions', description: 'High-energy mix to wind down your day with great vibes.' },
 ]
 
 function ShowCard({ show }: { show: Show }) {
-  const { play, isPlaying, currentShow } = useAudio()
-  const isActive = show.isLive || (isPlaying && currentShow?.title === show.title)
+  const { play, isPlaying } = useAudio()
 
   return (
-    <div className={`glass-card p-4 hover-lift ${isActive ? 'ring-2 ring-accent' : ''}`}>
-      <div className="relative">
-        <img
-          src={show.image}
-          alt={show.presenter}
-          className="w-full aspect-square object-cover rounded-xl mb-4"
-        />
-        {show.isLive && (
-          <div className="absolute top-2 left-2 px-3 py-1 bg-red-500 rounded-full text-xs font-semibold text-white flex items-center gap-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-            LIVE
-          </div>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <h3 className="font-semibold text-lg truncate">{show.title}</h3>
-        <div className="flex items-center gap-2 text-sm text-slate-400">
-          <User className="w-4 h-4" />
-          <span className="truncate">{show.presenter}</span>
+    <div className={`glass-card p-5 hover-lift ${show.isLive ? 'ring-2 ring-accent' : ''}`}>
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-lg truncate">{show.title}</h3>
+          {show.isLive && (
+            <div className="flex items-center gap-2 mt-1">
+              <div className="live-beacon" />
+              <span className="text-xs font-semibold text-red-400 uppercase tracking-wider">On Air Now</span>
+            </div>
+          )}
         </div>
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-          <Clock className="w-4 h-4" />
-          <span>{show.time}</span>
-        </div>
-
         <button
           onClick={play}
-          className="w-full mt-3 flex items-center justify-center gap-2 py-2 rounded-lg bg-white/5 hover:bg-accent transition-colors text-sm font-medium"
+          className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+            show.isLive && isPlaying
+              ? 'bg-accent shadow-lg shadow-accent/25 scale-110'
+              : 'bg-white/10 hover:bg-accent'
+          }`}
+          aria-label="Listen live"
         >
-          <Play className="w-4 h-4" />
-          {show.isLive ? 'Listen Live' : 'Listen to Show'}
+          <Play className="w-4 h-4 text-white ml-0.5" />
         </button>
       </div>
+      <p className="text-slate-400 text-sm leading-relaxed">{show.description}</p>
     </div>
   )
 }
 
 export default function Schedule() {
-  const [activeTab, setActiveTab] = useState<'now' | 'upcoming'>('now')
-  const { currentShow } = useAudio()
-
   return (
     <section id="schedule" className="py-16 px-4">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            {currentShow ? 'On Air Now' : "What's On"}
-          </h2>
-          {currentShow && (
-            <p className="text-accent text-lg font-medium">
-              {currentShow.title} with {currentShow.presenter}
-            </p>
-          )}
-        </div>
-
-        <div className="flex justify-center mb-8">
-          <div className="inline-flex rounded-xl bg-white/5 p-1">
-            <button
-              onClick={() => setActiveTab('now')}
-              className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeTab === 'now' ? 'bg-accent text-white' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              On Now
-            </button>
-            <button
-              onClick={() => setActiveTab('upcoming')}
-              className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeTab === 'upcoming' ? 'bg-accent text-white' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Upcoming
-            </button>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-1">What's On Today</h2>
+            <p className="text-slate-500 text-sm">Tap a show to listen live</p>
           </div>
+          <Link to="/schedule" className="btn-outline text-sm px-4 py-2">
+            Full Schedule
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {showsData.map(show => (
-            <ShowCard key={show.id} show={show} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {todayShows.map(show => (
+            <ShowCard key={show.title} show={show} />
           ))}
-        </div>
-
-        <div className="text-center mt-8">
-          <a href="/schedule" className="btn-outline">
-            View Full Schedule
-          </a>
         </div>
       </div>
     </section>

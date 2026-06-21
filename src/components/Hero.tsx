@@ -1,40 +1,43 @@
-import { Play, Pause, Users, MapPin } from 'lucide-react'
+import { Play, Pause, MapPin } from 'lucide-react'
 import { useAudio } from '../context/AudioContext'
 
 function AudioVisualizer({ isPlaying }: { isPlaying: boolean }) {
   return (
     <div className="relative w-full h-72 flex items-center justify-center">
-      <div className="relative">
-        {[96, 72, 48].map((size, i) => (
+      <div className="relative flex items-center justify-center">
+        {[192, 144, 96].map((size, i) => (
           <div
             key={i}
-            className={`absolute rounded-full border border-accent/30 -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 transition-all duration-1000 ${isPlaying ? 'scale-100 opacity-100' : 'scale-75 opacity-40'}`}
+            className="absolute rounded-full border border-accent/25"
             style={{
-              width: `${size * 2}px`,
-              height: `${size * 2}px`,
-              animation: isPlaying ? `pulse ${2 + i * 0.5}s ease-in-out infinite` : 'none',
+              width: `${size}px`,
+              height: `${size}px`,
+              animation: isPlaying ? `pulse ${2 + i * 0.6}s ease-in-out infinite` : 'none',
+              opacity: isPlaying ? 1 : 0.3,
             }}
           />
         ))}
 
-        <div className="relative w-40 h-40">
+        <div className="relative w-36 h-36 z-10">
           <img
             src="/Selby+Pulse+Logo+(2).png"
             alt="Selby Pulse Radio"
-            className={`w-full h-full object-contain transition-all duration-700 ${isPlaying ? 'drop-shadow-[0_0_24px_rgba(20,184,166,0.6)] scale-105' : 'opacity-90'}`}
+            className={`w-full h-full object-contain transition-all duration-700 ${
+              isPlaying ? 'drop-shadow-[0_0_32px_rgba(20,184,166,0.5)] scale-110' : 'opacity-90'
+            }`}
           />
         </div>
       </div>
 
       {isPlaying && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-end gap-1 h-12">
-          {[...Array(24)].map((_, i) => (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-end gap-1 h-10">
+          {[...Array(20)].map((_, i) => (
             <div
               key={i}
               className="w-1.5 bg-gradient-to-t from-accent to-accent-light rounded-full animate-equalizer"
               style={{
-                animationDelay: `${i * 0.04}s`,
-                animationDuration: `${0.3 + (i % 4) * 0.1}s`,
+                animationDelay: `${i * 0.05}s`,
+                animationDuration: `${0.35 + (i % 5) * 0.08}s`,
               }}
             />
           ))}
@@ -45,7 +48,7 @@ function AudioVisualizer({ isPlaying }: { isPlaying: boolean }) {
 }
 
 export default function Hero() {
-  const { isPlaying, listeners, togglePlay, currentShow } = useAudio()
+  const { isPlaying, listeners, togglePlay, currentTrack } = useAudio()
 
   return (
     <section className="relative pt-24 pb-16 px-4 overflow-hidden">
@@ -57,9 +60,7 @@ export default function Hero() {
           <div className="text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-6">
               <div className="live-beacon" />
-              <span className="text-sm font-medium text-accent">
-                Broadcasting Live Now
-              </span>
+              <span className="text-sm font-medium text-accent">Broadcasting Live Now</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
@@ -69,24 +70,31 @@ export default function Hero() {
               </span>
             </h1>
 
-            <p className="text-slate-400 text-lg mb-3 max-w-xl mx-auto lg:mx-0">
-              A community radio station dedicated to bringing local voices, great music, community news and entertainment to Selby and the surrounding area.
+            <p className="text-slate-400 text-lg mb-6 max-w-xl mx-auto lg:mx-0">
+              We're a community radio station dedicated to bringing local voices, great music, community news and entertainment to Selby and the surrounding area.
             </p>
 
-            {currentShow && (
-              <p className="text-slate-500 text-sm mb-8 flex items-center gap-2 justify-center lg:justify-start">
-                <span className="text-accent font-medium">{currentShow.title}</span>
-                <span>with {currentShow.presenter}</span>
-                <span className="text-slate-600">·</span>
-                <span>{currentShow.time}</span>
-              </p>
+            {currentTrack && (
+              <div className="flex items-center gap-3 mb-6 justify-center lg:justify-start">
+                {currentTrack.artworkUrl && (
+                  <img
+                    src={currentTrack.artworkUrl}
+                    alt="Now playing"
+                    className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                  />
+                )}
+                <div className="text-sm text-left">
+                  <p className="text-slate-500 text-xs uppercase tracking-wider">Now Playing</p>
+                  <p className="text-white font-medium truncate max-w-[280px]">
+                    {currentTrack.artist && <span className="text-accent">{currentTrack.artist} — </span>}
+                    {currentTrack.title}
+                  </p>
+                </div>
+              </div>
             )}
 
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start mb-8">
-              <button
-                onClick={togglePlay}
-                className="btn-primary text-lg px-8 py-4 group"
-              >
+              <button onClick={togglePlay} className="btn-primary text-lg px-8 py-4 group">
                 {isPlaying ? (
                   <>
                     <Pause className="w-6 h-6" />
@@ -99,19 +107,20 @@ export default function Hero() {
                   </>
                 )}
               </button>
-
               <a href="/schedule" className="btn-secondary text-lg px-8 py-4">
                 View Schedule
               </a>
             </div>
 
             <div className="flex flex-wrap items-center gap-6 justify-center lg:justify-start text-sm">
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-accent" />
-                <span className="text-slate-300">
-                  <span className="font-bold text-white">{listeners.toLocaleString()}</span> listening now
-                </span>
-              </div>
+              {listeners > 0 && (
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                  <span className="text-slate-300">
+                    <span className="font-bold text-white">{listeners.toLocaleString()}</span> listening now
+                  </span>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-accent" />
                 <span className="text-slate-400">Selby, North Yorkshire</span>
@@ -129,22 +138,16 @@ export default function Hero() {
         </div>
 
         <div className="mt-16 pt-12 border-t border-white/5">
-          <div className="grid sm:grid-cols-3 gap-8 text-center">
-            <div className="glass-card p-6">
-              <p className="text-slate-300 leading-relaxed">
-                "Whether you're tuning in for your favourite presenter, discovering new music, or keeping up with what's happening locally, we're delighted to have you with us."
-              </p>
-            </div>
-            <div className="glass-card p-6">
-              <p className="text-slate-300 leading-relaxed">
-                "We believe community radio should be accessible, inclusive and entertaining. Our volunteers and presenters work hard to create programmes that inform, entertain and connect people."
-              </p>
-            </div>
-            <div className="glass-card p-6">
-              <p className="text-slate-300 leading-relaxed">
-                "Made by the community, for the community. Powered by a passionate team of volunteers, presenters, and local supporters giving people the opportunity to share their voice."
-              </p>
-            </div>
+          <div className="grid sm:grid-cols-3 gap-6 text-center">
+            {[
+              'Whether you\'re tuning in for your favourite presenter, discovering new music, or keeping up with what\'s happening locally, we\'re delighted to have you with us.',
+              'We believe community radio should be accessible, inclusive and entertaining. Our volunteers and presenters work hard to create programmes that inform, entertain and connect people.',
+              'Made by the community, for the community. Powered by a passionate team of volunteers, presenters, and local supporters giving people the opportunity to share their voice.',
+            ].map((quote, i) => (
+              <div key={i} className="glass-card p-6">
+                <p className="text-slate-400 leading-relaxed text-sm">"{quote}"</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -18,54 +18,56 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-slate-400 text-sm leading-relaxed">
-              A community radio station dedicated to bringing local voices, great music, community news and entertainment to Selby and the surrounding area.
+              A community radio station dedicated to bringing local voices, great music and entertainment to Selby and the surrounding area.
             </p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Quick Links</h4>
+            <h4 className="font-semibold mb-4">On Air</h4>
             <ul className="space-y-2 text-sm text-slate-400">
               <li><Link to="/schedule" className="hover:text-accent transition-colors">Schedule</Link></li>
-              <li><Link to="/news" className="hover:text-accent transition-colors">News</Link></li>
-              <li><Link to="/events" className="hover:text-accent transition-colors">Events</Link></li>
-              <li><Link to="/advertise" className="hover:text-accent transition-colors">Advertise</Link></li>
-              <li><Link to="/contact" className="hover:text-accent transition-colors">Contact</Link></li>
+              <li><Link to="/blog" className="hover:text-accent transition-colors">Blog</Link></li>
+              <li><Link to="/community-hub" className="hover:text-accent transition-colors">Community Hub</Link></li>
+              <li><Link to="/sponsors" className="hover:text-accent transition-colors">Our Sponsors</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Selby Pulse Studio</h4>
-            <address className="not-italic space-y-1 text-sm text-slate-400">
-              <p>Our Space</p>
-              <p>58 Flaxley Road</p>
-              <p>Selby</p>
-              <p>YO8 4BW</p>
-              <p className="mt-3">
-                <a href="mailto:SelbyPulseRadio@gmail.com" className="hover:text-accent transition-colors">
-                  SelbyPulseRadio@gmail.com
-                </a>
-              </p>
-            </address>
+            <h4 className="font-semibold mb-4">Get Involved</h4>
+            <ul className="space-y-2 text-sm text-slate-400">
+              <li><Link to="/advertise" className="hover:text-accent transition-colors">Advertise With Us</Link></li>
+              <li><Link to="/join-team" className="hover:text-accent transition-colors">Join the Team</Link></li>
+              <li><Link to="/meet-the-team" className="hover:text-accent transition-colors">Meet the Team</Link></li>
+              <li><Link to="/about" className="hover:text-accent transition-colors">About Us</Link></li>
+              <li><Link to="/contact" className="hover:text-accent transition-colors">Contact Us</Link></li>
+            </ul>
           </div>
 
           <div>
             <h4 className="font-semibold mb-4">Our Studio</h4>
+            <address className="not-italic text-sm text-slate-400 space-y-1 mb-4">
+              <p>Our Space</p>
+              <p>58 Flaxley Road</p>
+              <p>Selby, YO8 4BW</p>
+              <p className="mt-3">
+                <a href="mailto:selbypulseradio@gmail.com" className="hover:text-accent transition-colors">
+                  selbypulseradio@gmail.com
+                </a>
+              </p>
+            </address>
             <div className="rounded-xl overflow-hidden">
               <img
                 src="/OurSpace.png"
                 alt="Selby Pulse Radio Studio"
-                className="w-full h-32 object-cover"
+                className="w-full h-24 object-cover"
               />
             </div>
-            <p className="text-xs text-slate-500 mt-2">
-              At Selby Pulse, we are committed to making an enjoyable audio adventure, taking you across the nation with sounds from around the globe!
-            </p>
           </div>
         </div>
 
         <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
           <p>© 2025 Selby Pulse Radio. Licensed by PRS for Music and PPL.</p>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap justify-center">
             <Link to="/tcs" className="hover:text-slate-300 transition-colors">Terms &amp; Conditions</Link>
             <Link to="/privacy-policy" className="hover:text-slate-300 transition-colors">Privacy Policy</Link>
             <Link to="/contact" className="hover:text-slate-300 transition-colors">Contact Us</Link>
