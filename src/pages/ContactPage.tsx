@@ -96,8 +96,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Email Us</h3>
-                  <p className="text-slate-400">info@selbypulseradio.co.uk</p>
-                  <p className="text-slate-400">studio@selbypulseradio.co.uk</p>
+                  <a href="mailto:SelbyPulseRadio@gmail.com" className="text-slate-400 hover:text-accent transition-colors">SelbyPulseRadio@gmail.com</a>
                 </div>
               </div>
 
@@ -107,8 +106,8 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Visit Us</h3>
-                  <p className="text-slate-400">Selby Community Centre</p>
-                  <p className="text-slate-400">Selby, North Yorkshire</p>
+                  <p className="text-slate-400">Our Space, 58 Flaxley Road</p>
+                  <p className="text-slate-400">Selby, YO8 4BW</p>
                 </div>
               </div>
 

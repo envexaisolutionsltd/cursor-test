@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Radio, Sun, Moon } from 'lucide-react'
+import { Menu, X, Sun, Moon } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
 
 const navLinks = [
@@ -18,16 +18,19 @@ export default function Navigation() {
   const location = useLocation()
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-surface-dark/80 dark:bg-surface-dark/80 light:bg-white/80 backdrop-blur-md border-b border-white/10 dark:border-white/10 light:border-slate-200">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-surface-dark/90 backdrop-blur-md border-b border-white/10">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-accent to-accent-light group-hover:shadow-lg group-hover:shadow-accent/25 transition-shadow">
-              <Radio className="w-5 h-5 text-white" />
+          <Link to="/" className="flex items-center gap-3 group">
+            <img
+              src="/Selby+Pulse+Logo+(2).png"
+              alt="Selby Pulse Radio"
+              className="h-10 w-10 object-contain group-hover:scale-105 transition-transform"
+            />
+            <div className="hidden sm:block">
+              <span className="font-bold text-lg leading-tight block">Selby Pulse</span>
+              <span className="text-xs text-accent leading-tight block">Radio</span>
             </div>
-            <span className="font-bold text-lg hidden sm:block">
-              Selby Pulse
-            </span>
           </Link>
 
           <div className="hidden lg:flex items-center gap-1">
@@ -37,7 +40,7 @@ export default function Navigation() {
                 to={link.path}
                 className={`nav-link ${
                   location.pathname === link.path
-                    ? 'text-white'
+                    ? 'text-white after:w-full!'
                     : 'text-slate-300 hover:text-white'
                 }`}
               >
@@ -49,13 +52,13 @@ export default function Navigation() {
           <div className="flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-xl bg-white/5 dark:bg-white/5 hover:bg-white/10 transition-colors"
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (
                 <Sun className="w-5 h-5 text-yellow-400" />
               ) : (
-                <Moon className="w-5 h-5 text-slate-600" />
+                <Moon className="w-5 h-5 text-slate-300" />
               )}
             </button>
 

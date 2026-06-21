@@ -10,6 +10,8 @@ import NewsPage from './pages/NewsPage'
 import EventsPage from './pages/EventsPage'
 import AdvertisePage from './pages/AdvertisePage'
 import ContactPage from './pages/ContactPage'
+import TcsPage from './pages/TcsPage'
+import PrivacyPage from './pages/PrivacyPage'
 
 export default function App() {
   return (
@@ -26,6 +28,8 @@ export default function App() {
                 <Route path="/events" element={<EventsPage />} />
                 <Route path="/advertise" element={<AdvertisePage />} />
                 <Route path="/contact" element={<ContactPage />} />
+                <Route path="/tcs" element={<TcsPage />} />
+                <Route path="/privacy-policy" element={<PrivacyPage />} />
               </Routes>
             </div>
             <Footer />

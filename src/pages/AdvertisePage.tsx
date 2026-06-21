@@ -121,12 +121,12 @@ export default function AdvertisePage() {
         </div>
 
         <div className="glass-card p-8 text-center">
-          <h3 className="text-2xl font-bold mb-4">Need a Custom Package?</h3>
+          <h3 className="text-2xl font-bold mb-4">Discuss Advertising Opportunities</h3>
           <p className="text-slate-400 max-w-2xl mx-auto mb-6">
-            We understand every business is unique. Let's create a tailored advertising solution that perfectly matches your goals and budget.
+            Whether you'd like to promote a local event, discuss advertising opportunities, or simply say hello — we'd love to hear from you. Selby Pulse Radio is all about connecting with our community.
           </p>
           <a href="/contact" className="btn-primary">
-            Contact Our Sales Team
+            Get In Touch
           </a>
         </div>
       </div>
