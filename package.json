@@ -5,9 +5,10 @@
   "description": "God's Eye View with a Next.js server layer and free commercial intelligence providers.",
   "type": "module",
   "license": "MIT",
-  "engines": {"node": "24.x"},
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
-    "preinstall": "bash bootstrap.sh",
     "predev": "npm run build:client",
     "dev": "next dev",
     "prebuild": "npm run validate:deps && npm run validate && npm run test && npm run typecheck && npm run build:client && npm run validate:client",
@@ -21,7 +22,8 @@
     "validate": "node scripts/validate-release.mjs",
     "postinstall": "node scripts/postinstall-chromium.mjs",
     "validate:deps": "node scripts/validate-installed-deps.mjs",
-    "validate:client": "node scripts/validate-built-client.mjs"
+    "validate:client": "node scripts/validate-built-client.mjs",
+    "preinstall": "bash bootstrap.sh"
   },
   "dependencies": {
     "@mapbox/vector-tile": "3.0.0",
@@ -47,6 +49,11 @@
     "ws": "8.21.0",
     "@sparticuz/chromium": "149.0.0"
   },
-  "allowScripts": {"sharp@0.34.5": true, "esbuild@0.25.12": true},
-  "overrides": {"esbuild": "0.25.12"}
+  "allowScripts": {
+    "sharp@0.34.5": true,
+    "esbuild@0.25.12": true
+  },
+  "overrides": {
+    "esbuild": "0.25.12"
+  }
 }

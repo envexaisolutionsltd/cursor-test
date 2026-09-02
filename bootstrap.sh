@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cat overlay.part-*.b64 | base64 -d > overlay.tar.gz
-rm -rf src public app lib config scripts .gev-upstream
+
 BASE_DIR=".gev-upstream"
+rm -rf src public app lib config scripts "$BASE_DIR"
+
 git clone --depth 1 --filter=blob:none --sparse https://github.com/bilawalsidhu/gods-eye-view.git "$BASE_DIR"
 git -C "$BASE_DIR" sparse-checkout set src public config
+
 mkdir -p src public config
 cp -rn "$BASE_DIR/src/." src/
 cp -rn "$BASE_DIR/public/." public/
@@ -13,6 +15,8 @@ for f in index.html style.css LICENSE; do
   if [ -e "$BASE_DIR/$f" ]; then cp "$BASE_DIR/$f" "$f"; fi
 done
 rm -rf "$BASE_DIR"
+
 tar -xzf overlay.tar.gz -C .
-rm -f overlay.tar.gz overlay.part-*.b64
+rm -f overlay.tar.gz
+
 echo "God's Eye v0.6.3 source bootstrapped and overlay applied."
