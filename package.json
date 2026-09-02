@@ -5,9 +5,7 @@
   "description": "God's Eye View with a Next.js server layer and free commercial intelligence providers.",
   "type": "module",
   "license": "MIT",
-  "engines": {
-    "node": "24.x"
-  },
+  "engines": {"node": "24.x"},
   "scripts": {
     "predev": "npm run build:client",
     "dev": "next dev",
@@ -49,11 +47,6 @@
     "ws": "8.21.0",
     "@sparticuz/chromium": "149.0.0"
   },
-  "allowScripts": {
-    "sharp@0.34.5": true,
-    "esbuild@0.25.12": true
-  },
-  "overrides": {
-    "esbuild": "0.25.12"
-  }
+  "allowScripts": {"sharp@0.34.5": true, "esbuild@0.25.12": true},
+  "overrides": {"esbuild": "0.25.12"}
 }
