@@ -1,0 +1,81 @@
+ching for styleManager._dataManager
+         // would make a private field part of this feature's contract.
+-        initFirstRunExperience({ styleManager, dataManager });
++        initFirstRunExperience({
++          styleManager,
++          dataManager,
++          openCommercial: () => commercialController?.openCommand?.(),
++        });
+       };
+       loadingScreen.addEventListener('transitionend', revealFirstRun, { once: true });
+       setTimeout(revealFirstRun, 900);
+@@ -326,12 +368,36 @@ async function init() {
+       getRenderGovernorDiagnostics,
+       requestRender: governorRequestRender,
+     };
+-    window.__godsEyeView.voiceCommands = initGevVoiceCommands({ viewer, styleManager, dataManager, sceneDirector, annotations });
++    try {
++      window.__godsEyeView.voiceCommands = initGevVoiceCommands({ viewer, styleManager, dataManager, sceneDirector, annotations });
++    } catch (error) {
++      console.warn('[Boot] Voice controls unavailable; core God\'s Eye remains active:', error);
++      window.__godsEyeView.voiceCommands = null;
++    }
++
++    // Commercial intelligence is additive. A failure in free-market research or
++    // optional provider integration must never prevent the original globe booting.
++    try {
++      commercialController = initCommercialIntelligence({
++        viewer,
++        dataManager,
++        layer: commercialBusinessesLayer,
++        marketLayer: commercialMarketsLayer,
++      });
++      window.__godsEyeView.commercialController = commercialController;
++    } catch (error) {
++      console.warn('[Boot] Commercial intelligence unavailable; original God\'s Eye remains active:', error);
++      window.__godsEyeView.commercialController = null;
++    }
+ 
+   } catch (error) {
+     console.error("God's Eye View initialization failed:", error);
+-    loaderStatus.textContent = `Error: ${describeError(error)}`;
+-    loaderStatus.style.color = '#ff4444';
++    window.__gevBootFail?.(error);
++    if (loaderStatus) {
++      loaderStatus.textContent = `STARTUP ERROR · ${describeError(error)}`;
++      loaderStatus.style.color = '#ff6b6b';
++      loaderStatus.style.opacity = '1';
++    }
+   }
+ }
+ 
+diff --git a/vite.config.js b/vite.config.js
+index 6edefe8..1acc0ae 100644
+--- a/vite.config.js
++++ b/vite.config.js
+@@ -45,7 +45,6 @@ import { filterTrailing24h, parseFirmsCsv } from './src/data/firmsCsv.js';
+ import { fileURLToPath } from 'node:url';
+ import { createRequire } from 'node:module';
+ import { defineConfig, loadEnv } from 'vite';
+-import cesium from 'vite-plugin-cesium';
+ import { normalizeRadioCountryInput } from './src/data/radioCountry.js';
+ import {
+   normalizeRegionalArticles,
+@@ -7676,7 +7675,6 @@ export default defineConfig(({ mode }) => {
+   const localAllowedHosts = ['localhost', '127.0.0.1', '.local'];
+   return {
+     plugins: [
+-      cesium(),
+       openSkyProxy(),
+       celestrakProxy(),
+       tomtomProxy(),
+@@ -7725,6 +7723,9 @@ export default defineConfig(({ mode }) => {
+     define: {
+       'import.meta.env.GOOGLE_MAPS_API_KEY': JSON.stringify(env.GOOGLE_MAPS_API_KEY),
+       'import.meta.env.CESIUM_ION_TOKEN': JSON.stringify(env.CESIUM_ION_TOKEN),
++      // Cesium's ESM runtime resolves Workers/Assets/Widgets/ThirdParty from here.
++      // The production build copies those directories explicitly.
++      CESIUM_BASE_URL: JSON.stringify('/gev/cesium/'),
+     },
+     build: {
+       // The Cesium engine bundle is inherently large; raise the warning ceiling

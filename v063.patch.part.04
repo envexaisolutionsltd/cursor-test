@@ -1,0 +1,101 @@
+sult = () => true, globe = async () => ({ ok: true }), commercial = async () => true } = {}) {
++  const calls = { contextModes: [], layerIds: [], globeFlights: 0, commercialOpens: 0 };
+   return {
+     calls,
+     deps: {
+@@ -391,18 +391,22 @@ function missionSpy({ contextOk = true, layerResult = () => true, globe = async
+         calls.globeFlights += 1;
+         return globe();
+       },
++      openCommercial: async () => {
++        calls.commercialOpens += 1;
++        return commercial();
++      },
+     },
+   };
+ }
+ 
+-test('the menu is the four owner-ordered missions', () => {
++test('the menu keeps the original missions and adds commercial recon', () => {
+   // INFRASTRUCTURE was removed after the owner playtested it: enabling all
+   // three bundled layers at once put ~5,700 entities on a full-earth view and
+   // tanked the frame rate. The layers stay reachable by hand and by voice; what
+   // went is the one-click globe-scale dump. Restoring the tile needs the
+   // globe-LOD declutter first.
+   assert.deepEqual(Object.keys(FIRST_RUN_MISSIONS), [
+-    'contacts', 'space-missions', 'environmental', 'explore',
++    'contacts', 'space-missions', 'commercial', 'environmental', 'explore',
+   ]);
+   assert.equal(FIRST_RUN_MISSIONS.infrastructure, undefined,
+     'the infrastructure mission must be gone, not dormant');
+@@ -420,6 +424,16 @@ test('Live Contacts and Space Missions go through the one setContextMode facade'
+   }
+ });
+ 
++test('Commercial Recon opens only the commercial command surface', async () => {
++  const spy = missionSpy();
++  const outcome = await runFirstRunChoice('commercial', spy.deps);
++  assert.equal(outcome.ok, true);
++  assert.deepEqual(spy.calls.contextModes, []);
++  assert.deepEqual(spy.calls.layerIds, []);
++  assert.equal(spy.calls.globeFlights, 0);
++  assert.equal(spy.calls.commercialOpens, 1);
++});
++
+ test('Environmental enables BOTH its feeds and pulls out to the globe', async () => {
+   const spy = missionSpy();
+   const outcome = await runFirstRunChoice('environmental', spy.deps);
+@@ -477,9 +491,9 @@ test('a refused layer fails the mission by name, and a stalled flight never does
+ test('Explore manually touches nothing at all, and an unknown choice is inert', async () => {
+   const spy = missionSpy();
+   assert.equal((await runFirstRunChoice('explore', spy.deps)).ok, true);
+-  assert.deepEqual(spy.calls, { contextModes: [], layerIds: [], globeFlights: 0 });
++  assert.deepEqual(spy.calls, { contextModes: [], layerIds: [], globeFlights: 0, commercialOpens: 0 });
+   assert.equal((await runFirstRunChoice('nope', spy.deps)).ok, false);
+-  assert.deepEqual(spy.calls, { contextModes: [], layerIds: [], globeFlights: 0 });
++  assert.deepEqual(spy.calls, { contextModes: [], layerIds: [], globeFlights: 0, commercialOpens: 0 });
+ });
+ 
+ test('a failed Context mission reports the layers the facade named', async () => {
+@@ -550,7 +564,7 @@ test('markup, startup ordering and accessibility remain pinned', () => {
+   const css = fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8');
+ 
+   assert.match(html, /id="first-run-launcher" role="dialog"[^>]*aria-labelledby="first-run-title"[^>]*hidden/);
+-  assert.equal((html.match(/data-first-run-choice=/g) || []).length, 4);
++  assert.equal((html.match(/data-first-run-choice=/g) || []).length, 5);
+   assert.match(html, /data-first-run-status[^>]*role="status"[^>]*aria-live="polite"/);
+   assert.match(html, /<input type="checkbox" data-first-run-suppress \/>/);
+   assert.match(html, /<strong data-first-run-environmental-title>/);
+@@ -573,14 +587,14 @@ test('markup, startup ordering and accessibility remain pinned', () => {
+ 
+   // Menu order is the owner's, read straight off the markup.
+   const order = [...html.matchAll(/data-first-run-choice="([a-z-]+)"/g)].map((match) => match[1]);
+-  assert.deepEqual(order, ['contacts', 'space-missions', 'environmental', 'explore']);
++  assert.deepEqual(order, ['contacts', 'space-missions', 'commercial', 'environmental', 'explore']);
+   assert.doesNotMatch(html, /data-first-run-choice="infrastructure"/,
+     'the removed tile must leave no markup behind');
+ 
+   const startup = main.slice(main.indexOf('void Promise.all(['), main.indexOf('// Expose for debugging'));
+   assert.match(startup, /styleManager\.initialRestorePromise/);
+   assert.ok(startup.indexOf("loadingScreen.classList.add('hidden')") < startup.indexOf('initFirstRunExperience'));
+-  assert.match(startup, /initFirstRunExperience\(\{ styleManager, dataManager \}\)/);
++  assert.match(startup, /initFirstRunExperience\(\{[\s\S]*?styleManager,[\s\S]*?dataManager,[\s\S]*?openCommercial:/);
+ 
+   assert.match(css, /body\.ui-clean-view #first-run-launcher/);
+   assert.match(css, /body\.recording-mode #first-run-launcher/);
+diff --git a/src/main.js b/src/main.js
+index 84fbf12..b240d3c 100644
+--- a/src/main.js
++++ b/src/main.js
+@@ -1,4 +1,5 @@
+ import * as Cesium from 'cesium';
++import 'cesium/Build/Cesium/Widgets/widgets.css';
+ import { StyleManager } from './ui.js';
+ import { flyToAustin } from './camera.js';
+ import { DataLayerManager } from './data/manager.js';
+@@ -14,6 +15,8 @@ import bikeshareLayer from './data/bikeshare.js';
+ import aisLiveVesselsLayer from './data/aisLiveVessels.js';
+ import militaryInstallationsLayer from './data/militaryInstallations.js';
+ import militaryAwarenessLayer from './data/militaryAwareness.js';
++import commercialBusinessesLayer from './data/commercialBusinesses.js';
++import commercialMarketsLayer from './d

@@ -1,0 +1,121 @@
+ata/commercialMarkets.js';
+ import localDataLayers from './data/localLayers.js';
+ import { LAYER_STATE_REGISTRY } from './data/layerState.js';
+ import { registerDataCredits } from './data/dataCredits.js';
+@@ -34,8 +37,15 @@ import { installScopeMask } from './scopeMask.js';
+ import { initFirstRunExperience } from './firstRunExperience.js';
+ import { initKeySetup } from './keySetup.js';
+ import { loadPhotorealisticTileset } from './mapStartup.js';
++import { initCommercialIntelligence } from './commercial/controller.js';
+ 
+-initLogoGaze();
++window.__gevSetBootStage?.('module-evaluated');
++try {
++  initLogoGaze();
++} catch (error) {
++  // Logo gaze is decorative and must never be allowed to block the globe.
++  console.warn('[Boot] Logo gaze unavailable:', error);
++}
+ 
+ /**
+  * Extract a human-readable error message from any thrown value.
+@@ -69,11 +79,16 @@ function describeError(error) {
+  * style system, intelligence HUD, location presets, and share links.
+  */
+ async function init() {
++  window.__gevSetBootStage?.('init-start');
+   const loadingScreen = document.getElementById('loading-screen');
+-  const loaderStatus = loadingScreen.querySelector('.loader-status');
++  const loaderStatus = loadingScreen?.querySelector('.loader-status');
+ 
+   try {
++    if (!loadingScreen || !loaderStatus) {
++      throw new Error('God\'s Eye loading surface is missing from the document');
++    }
+     loaderStatus.textContent = 'Configuring viewer...';
++    window.__gevSetBootStage?.('viewer-create');
+ 
+     // A direct Google key provides Google 3D plus GEV place search. Cesium ion
+     // can host the same 3D tiles and also powers Bing/world-terrain stacks.
+@@ -124,6 +139,7 @@ async function init() {
+     // 2026-08-05 perf investigation as a strict halving of idle burn on
+     // 120 Hz hardware; a no-op on 60 Hz displays. (perf item 2)
+     viewer.targetFrameRate = 60;
++    window.__gevSetBootStage?.('viewer-ready');
+ 
+     // Register per-layer data attribution into the "Data attribution" popover.
+     // Required by each source's license (ODbL, CC BY-NC-SA, NASA FIRMS, etc.);
+@@ -148,6 +164,7 @@ async function init() {
+     loaderStatus.textContent = googleApiKey || cesiumToken
+       ? 'Loading Google 3D Tiles...'
+       : 'Loading the keyless globe...';
++    window.__gevSetBootStage?.('map-provider');
+     const photoreal = await loadPhotorealisticTileset(Cesium, {
+       googleApiKey,
+       cesiumToken,
+@@ -185,7 +202,9 @@ async function init() {
+       },
+       onError: (message) => console.warn('[MapStack]', message),
+     });
++    window.__gevSetBootStage?.('map-stack');
+     await mapStackController.setStack(tileset ? 'photoreal' : 'esri-imagery', { silent: true });
++    window.__gevSetBootStage?.('map-ready');
+ 
+     // Initialize the style manager (post-processing, HUD, locations, share links)
+     const styleManager = new StyleManager(viewer, { mapStackController });
+@@ -204,6 +223,7 @@ async function init() {
+     }
+ 
+     // Initialize data layer manager
++    window.__gevSetBootStage?.('data-layers');
+     const dataManager = new DataLayerManager(viewer, {
+       allowQaRegistration: import.meta.env.DEV,
+     });
+@@ -220,6 +240,8 @@ async function init() {
+     dataManager.register(aisLiveVesselsLayer);
+     dataManager.register(militaryInstallationsLayer);
+     dataManager.register(militaryAwarenessLayer);
++    dataManager.register(commercialBusinessesLayer);
++    dataManager.register(commercialMarketsLayer);
+     militaryAwarenessLayer.attachDataManager(dataManager);
+     for (const layer of localDataLayers) {
+       dataManager.register(layer);
+@@ -239,6 +261,10 @@ async function init() {
+     dataManager.buildTogglePanel(document.getElementById('data-toggles'));
+     styleManager.attachDataManager(dataManager);
+ 
++    // Initialized after the original realtime/voice dock has created its DOM
++    // surface, so the commercial RECON control can extend that exact command dock.
++    let commercialController = null;
++
+     // Initialize deterministic scene playback for social clip capture
+     const sceneDirector = new SceneDirector(viewer, styleManager, dataManager);
+ 
+@@ -247,11 +273,23 @@ async function init() {
+ 
+     // Keep startup chrome truthful: a share is not restored until camera,
+     // visual/map/panel lanes, and every requested layer have terminated.
++    window.__gevSetBootStage?.('restore-state');
++    const restoreGuard = Promise.race([
++      Promise.resolve(styleManager.initialRestorePromise).catch((error) => {
++        console.warn('[Boot] Shared-state restore failed; continuing with the live globe:', error);
++      }),
++      new Promise((resolve) => setTimeout(() => {
++        console.warn('[Boot] Shared-state restore exceeded 8 seconds; continuing with the live globe.');
++        resolve();
++      }, 8000)),
++    ]);
+     void Promise.all([
+-      styleManager.initialRestorePromise,
++      restoreGuard,
+       new Promise((resolve) => setTimeout(resolve, 1000)),
+     ]).finally(() => {
++      window.__gevSetBootStage?.('ready');
+       loadingScreen.classList.add('hidden');
++      window.__gevBootComplete?.();
+       // Reveal only after the loading cover has yielded. transitionend can be
+       // absent under reduced motion, so a bounded fallback makes this reliable.
+       let firstRunRevealed = false;
+@@ -261,7 +299,11 @@ async function init() {
+         // dataManager is passed explicitly: the globe missions enable bundled
+         // keyless layers through it, and rea
