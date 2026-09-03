@@ -1,0 +1,165 @@
+html-ready',
++        complete: false,
++        startedAt: Date.now(),
++        error: null,
++      };
++      const status = () => document.querySelector('#loading-screen .loader-status');
++      const clean = (value) => String(value || 'Unknown startup error')
++        .replace(/\s+/g, ' ').trim().slice(0, 360);
++
++      window.__gevSetBootStage = (stage) => {
++        if (!state.complete) state.stage = clean(stage || 'unknown');
++      };
++      window.__gevBootComplete = () => {
++        state.stage = 'ready';
++        state.complete = true;
++      };
++      window.__gevBootFail = (error) => {
++        if (state.complete) return;
++        const detail = clean(error?.stack || error?.message || error);
++        state.error = detail;
++        const el = status();
++        if (el) {
++          el.textContent = `STARTUP ERROR · ${detail}`;
++          el.style.color = '#ff6b6b';
++          el.style.opacity = '1';
++          el.style.maxWidth = '760px';
++        }
++        console.error('[GEV boot]', error);
++      };
++
++      window.addEventListener('error', (event) => {
++        if (event.target && event.target !== window) {
++          const tag = event.target.tagName;
++          if (tag === 'SCRIPT') {
++            window.__gevBootFail(new Error(`Required script failed to load: ${event.target.src || 'unknown script'}`));
++          }
++          return;
++        }
++        window.__gevBootFail(event.error || new Error(event.message || 'Browser startup error'));
++      }, true);
++      window.addEventListener('unhandledrejection', (event) => {
++        window.__gevBootFail(event.reason || new Error('Unhandled startup promise rejection'));
++      });
++
++      window.setTimeout(() => {
++        if (!state.complete) {
++          window.__gevBootFail(new Error(`Startup stalled at ${state.stage}`));
++        }
++      }, 45000);
++    })();
++  </script>
+   <script type="module" src="/src/main.js"></script>
+ </body>
+ </html>
+diff --git a/package.json b/package.json
+index d977286..a4f4fbd 100644
+--- a/package.json
++++ b/package.json
+@@ -1,60 +1,58 @@
+ {
+-  "name": "gods-eye-view",
++  "name": "gods-eye-view-free-commercial",
+   "private": true,
+-  "version": "0.1.1",
+-  "description": "A real-time intelligence console for planet Earth — photorealistic 3D globe, live aircraft/ships/satellites/earthquakes/CCTV, and hands-free voice control. Runs in a browser.",
++  "version": "0.6.3",
++  "description": "God's Eye View with a Next.js server layer and free commercial intelligence providers.",
+   "type": "module",
+   "license": "MIT",
+-  "author": "Bilawal Sidhu",
+-  "homepage": "https://github.com/bilawalsidhu/gods-eye-view#readme",
+-  "repository": {
+-    "type": "git",
+-    "url": "https://github.com/bilawalsidhu/gods-eye-view.git"
+-  },
+-  "bugs": {
+-    "url": "https://github.com/bilawalsidhu/gods-eye-view/issues"
+-  },
+   "engines": {
+-    "node": ">=24.14.0 <25 || >=26 <27"
++    "node": "24.x"
+   },
+-  "keywords": [
+-    "cesium",
+-    "3d-globe",
+-    "geospatial",
+-    "osint",
+-    "spatial-intelligence",
+-    "photorealistic-3d-tiles",
+-    "adsb",
+-    "ais",
+-    "satellites",
+-    "voice-control",
+-    "openai-realtime",
+-    "visualization"
+-  ],
+   "scripts": {
++    "predev": "npm run build:client",
++    "dev": "next dev",
++    "prebuild": "npm run validate:deps && npm run validate && npm run test && npm run typecheck && npm run build:client && npm run validate:client",
++    "build": "next build",
++    "build:client": "node scripts/build-gev-client.mjs",
++    "start": "next start",
++    "typecheck": "tsc --noEmit",
++    "test": "node scripts/run-commercial-tests.mjs",
++    "test:world": "node scripts/run-unit-tests.mjs",
+     "doctor": "node scripts/setup-doctor.mjs",
+-    "dev": "vite",
+-    "dev:secure": "./scripts/dev-secure.sh",
+-    "opensky:import": "./scripts/opensky-import-client.sh",
+-    "build": "vite build",
+-    "preview": "vite preview",
+-    "test": "node scripts/run-unit-tests.mjs",
+-    "test:track": "node scripts/track-regression.mjs",
+-    "qa:map-source-tray": "node scripts/qa-map-source-tray.mjs"
++    "validate": "node scripts/validate-release.mjs",
++    "postinstall": "node scripts/postinstall-chromium.mjs",
++    "validate:deps": "node scripts/validate-installed-deps.mjs",
++    "validate:client": "node scripts/validate-built-client.mjs"
+   },
+   "dependencies": {
+-    "@mapbox/vector-tile": "^3.0.0",
+-    "cesium": "^1.124.0",
+-    "egm96-universal": "^1.1.1",
+-    "mgrs": "^2.1.0",
+-    "pbf": "^5.1.2",
+-    "satellite.js": "^6.0.2"
++    "@mapbox/vector-tile": "3.0.0",
++    "@sparticuz/chromium-min": "149.0.0",
++    "cesium": "1.124.0",
++    "egm96-universal": "1.1.1",
++    "mgrs": "2.1.0",
++    "next": "16.3.4",
++    "pbf": "5.1.2",
++    "pmtiles": "4.5.0",
++    "puppeteer-core": "25.1.0",
++    "react": "19.2.8",
++    "react-dom": "19.2.8",
++    "satellite.js": "6.0.2"
+   },
+   "devDependencies": {
+-    "puppeteer": "^24.37.5",
+-    "sharp": "^0.34.5",
+-    "vite": "^6.0.0",
+-    "vite-plugin-cesium": "^1.2.23",
+-    "ws": "^8.21.0"
++    "@types/node": "24.0.0",
++    "@types/react": "19.2.18",
++    "@types/react-dom": "19.2.5",
++    "sharp": "0.34.5",
++    "typescript": "6.0.3",
++    "vite": "6.4.3",
++    "ws": "8.21.0",
++    "@sparticuz/chromium": "149.0.0"
++  },
++  "allowScripts": {
++    "sharp@0.34.5": true,
++    "esbuild@0.25.12": true
++  },
++  "overrides": {
++    "esbuild": "0.25.12"
+   }
+ }
+diff --git a/scripts/dev-fresh.sh b/scripts/dev-fresh.sh
+index 0b01932..c1f888c 1
